@@ -16,6 +16,7 @@ def chat_with_ai(messages, model="gpt-4-turbo"):
         if chunk.choices[0].delta.content is not None:
             yield chunk.choices[0].delta.content  # 使用 yield 而不是 print
 
+
 '''# 使用示例
 for response_part in chat_with_ai("user", "用Verilog写FIFO代码"):
     print(response_part, end="")'''

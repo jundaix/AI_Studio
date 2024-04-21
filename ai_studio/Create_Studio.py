@@ -20,7 +20,13 @@ class Studio:
 def create_agent(studio_instance):
     name_input = input("给这个机器人起个名字\n")
     system_input = input("定义该机器人的角色与任务： \n")
-    model_input = input("请选择模型 gpt-3.5-turbo  or  gpt-4-0125-preview \n")
+    model_input = input("请选择模型 \n 1:gpt-3.5-turbo \n 2.gpt-4-0125-preview \n 3.gpt-4-turbo \n")
+    if model_input == 1:
+        model_input = "gpt-3.5-turbo"
+    elif model_input == 2:
+        model_input = "gpt-4-0125-preview"
+    elif model_input == 3:
+        model_input = "gpt-4-turbo"
     use_context_input = input("是否启用上下文 请只回答 True 或者 Flase \n")
     new_agent = Agent(name=name_input, system=system_input, model=model_input, use_context=use_context_input)
     studio_instance.apply_agent(new_agent)
