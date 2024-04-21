@@ -1,29 +1,33 @@
-import openai
 from ai_studio.agent import Agent
 from ai_studio.functioncalling import functioncall
-from ai_studio.Create_Studio import create_studio,current_studio
-# 设置你的OpenAI API密钥
-openai.api_key = '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'
+from ai_studio.Create_Studio import create_studio, get_current_studio
 
 # 示例调用
 #gpt-4-0125-preview
 #gpt-3.5-turbo
 #gpt-4-turbo
-start_prompt_before = "当前没有工作室，是否要创建一个\n"
-start_prompt = input(start_prompt_before)
-start_prompt = start_prompt + start_prompt_before
-start_command = functioncall(start_prompt)
-if start_command == "create_studio":
-    create_studio()
-else:
-    print("出现了其他命令："+start_command)
 
-# 创建Robot实例
-
-while 1:
-    # 开始对话
-    user_input = input("用户： ")
-    print("助手：", current_studio.current_agent.send_message(user_input))
+if __name__ == "__main__":
+    start_prompt_before = "当前没有工作室，是否要创建一个\n"
+    start_prompt = input(start_prompt_before)
+    start_prompt = start_prompt + start_prompt_before
+    start_command = functioncall(start_prompt)
+    if start_command == "create_studio":
+        create_studio()
+        print("当前代理检查:",
+              get_current_studio().current_agent.name if get_current_studio().current_agent else "无代理")  # 新添加的检查
+        if get_current_studio() and get_current_studio().current_agent:
+            while True:
+                user_input = input("用户： ")
+                if user_input.lower() == 'exit':  # 提供一个退出条件
+                    print("退出对话。")
+                    break
+                response = get_current_studio().current_agent.send_message(user_input)
+                print("助手：", response)
+        else:
+            print("助手尚未初始化或没有可用的代理。")
+    else:
+        print("出现了其他命令：" + start_command)
 
 '''
 现在已经完成了Agent的设计

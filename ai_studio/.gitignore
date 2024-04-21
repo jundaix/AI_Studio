@@ -1,1 +1,10 @@
 /.venv
+# IntelliJ IDEA files
+AI_studio.iml
+
+# IDE specific xml files
+misc.xml
+modules.xml
+profiles_settings.xml
+vcs.xml
+workspace.xml
