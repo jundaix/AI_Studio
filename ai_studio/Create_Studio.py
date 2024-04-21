@@ -55,12 +55,3 @@ def create_studio():
 
 def get_current_studio():
     return current_studio
-
-
-if __name__ == "__main__":
-    create_studio()
-    if current_studio and current_studio.current_agent:
-        user_input = input("请输入您的问题：")
-        print("助手：", current_studio.current_agent.send_message(user_input))
-    else:
-        print("助手尚未初始化或没有可用的代理。")
