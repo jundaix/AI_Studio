@@ -60,7 +60,7 @@ class Agent:
                 4  # every message follows <|start|>{role/name}\n{content}<|end|>\n
             )
             tokens_per_name = -1  # if there's a name, the role is omitted
-        elif self.model == "gpt-4-0125-preview":
+        elif self.model == "gpt-4-0125-preview" or "gpt-4-turbo":
             # !Note: gpt-4 may change over time. Returning num tokens assuming gpt-4-0314.")
             tokens_per_message = 3
             tokens_per_name = 1
