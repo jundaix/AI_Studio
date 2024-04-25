@@ -12,14 +12,12 @@ client = OpenAI(
 )
 
 
-
-
-
 def num_tokens_from_string(string: str, encoding_name: str) -> int:
     """Returns the number of tokens in a text string."""
     encoding = tiktoken.get_encoding(encoding_name)
     num_tokens = len(encoding.encode(string))
     return num_tokens
+
 
 def get_embedding(text, model="text-embedding-3-small"):
     """ 使用 OpenAI API 获取文本的嵌入向量 """
@@ -33,18 +31,24 @@ def load_text_file(file_path):
         return file.read()
 
 
-def split_text_to_fit_token_limit(text, max_tokens=8000):
-    """ 递归分割文本，确保每段的 token 数量不超过 max_tokens """
-    if num_tokens_from_string(text) <= max_tokens:
+def split_text_to_fit_token_limit(text, max_tokens=8000, split_prefix='%$#@!', split_suffix='!@#$%'):
+    """ 递归分割文本，确保每段的 token 数量不超过 max_tokens，并添加特定标识符 """
+    if num_tokens_from_string(text, "cl100k_base") <= max_tokens:
         return [text]
     else:
         # 尝试找到合适的分割点
         mid_point = len(text) // 2
-        part1 = text[:mid_point]
-        part2 = text[mid_point:]
+        # 确保在一个自然语言分割点进行分割（例如空格或句号后）
+        while mid_point < len(text) and not text[mid_point].isspace():
+            mid_point += 1
+
+        part1 = text[:mid_point].strip() + split_suffix
+        part2 = split_prefix + text[mid_point:].strip()
 
         # 对每部分递归调用此函数
-        return split_text_to_fit_token_limit(part1, max_tokens) + split_text_to_fit_token_limit(part2, max_tokens)
+        return split_text_to_fit_token_limit(part1, max_tokens, split_prefix,
+                                             split_suffix) + split_text_to_fit_token_limit(part2, max_tokens,
+                                                                                           split_prefix, split_suffix)
 
 
 def process_text_to_dataframe(text, min_newlines=4):
@@ -73,16 +77,9 @@ def cosine_similarity(v1, v2):
     return np.dot(v1, v2) / (norm(v1) * norm(v2))
 
 
-
-
-
-
-
-
-
 # 主执行逻辑
 if __name__ == "__main__":
-    # 读取文本文件
+    '''    # 读取文本文件
     text_data = load_text_file('三国演义_baihua.txt')  # 修改为你的文件路径
 
     total_token = num_tokens_from_string(text_data, "cl100k_base")
@@ -92,9 +89,9 @@ if __name__ == "__main__":
     df = process_text_to_dataframe(text_data)
 
     # 将 DataFrame 的内容（文本块和对应的向量）保存到 CSV 文件
-    df.to_csv('vectors_database.csv', index=False)
+    df.to_csv('vectors_database.csv', index=False)'''
 
-'''    # 读取向量数据库CSV 文件
+    # 读取向量数据库CSV 文件
     df = pd.read_csv('vectors_database.csv')
     # 假设 CSV 文件中储存向量的列名为 'embedding'
     # 将字符串转换为NumPy数组
@@ -107,10 +104,22 @@ if __name__ == "__main__":
     df['similarity'] = df['embedding'].apply(lambda x: cosine_similarity(x, query_vector))
 
     # 找出相似度最高的文本块
-    top_results = df.sort_values(by='similarity', ascending=False).head(10)
-    print(top_results[['chunk', 'similarity']])  # 确保打印的列名与 DataFrame 中的实际列名匹配
+    top_results = df.sort_values(by='similarity', ascending=False).head(1)
 
-'''
+    # 确保按正确方式访问 DataFrame
+    if not top_results.empty:
+        first_result = top_results.iloc[0]  # 使用 iloc 来获取第一行
+        result_text = first_result['chunk']  # 访问 'chunk' 列
+
+        message = [{"role": "user", "content": result_text + "\n" + input_query}]
+        #message = [{"role": "user", "content": input_query}]
+        # 使用结果
+        for response_part in chat_with_ai(message):
+            print(response_part, end="")
+    else:
+        print("没有找到相关的结果。")
+
+    #print(top_results[['chunk', 'similarity']])  # 确保打印的列名与 DataFrame 中的实际列名匹配
 
 '''
     for response_part in chat_with_ai():
