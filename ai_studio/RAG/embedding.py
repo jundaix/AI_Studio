@@ -7,9 +7,7 @@ from numpy.linalg import norm
 import tiktoken
 
 # 初始化 OpenAI 客户端
-client = OpenAI(
-    api_key="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",  # 替换为你的API密钥
-)
+client = OpenAI()
 
 
 def num_tokens_from_string(string: str, encoding_name: str) -> int:
@@ -31,6 +29,7 @@ def load_text_file(file_path):
         return file.read()
 
 
+#用'%$#@!' 文本是被分割后的文本的前半段  用'!@#$%'代表文本是被分割后的文本的后半段   方便后续进行拼接
 def split_text_to_fit_token_limit(text, max_tokens=8000, split_prefix='%$#@!', split_suffix='!@#$%'):
     """ 递归分割文本，确保每段的 token 数量不超过 max_tokens，并添加特定标识符 """
     if num_tokens_from_string(text, "cl100k_base") <= max_tokens:
@@ -104,7 +103,7 @@ if __name__ == "__main__":
     df['similarity'] = df['embedding'].apply(lambda x: cosine_similarity(x, query_vector))
 
     # 找出相似度最高的文本块
-    top_results = df.sort_values(by='similarity', ascending=False).head(1)
+    top_results = df.sort_values(by='similarity', ascending=False).head(10)
 
     # 确保按正确方式访问 DataFrame
     if not top_results.empty:
@@ -118,10 +117,3 @@ if __name__ == "__main__":
             print(response_part, end="")
     else:
         print("没有找到相关的结果。")
-
-    #print(top_results[['chunk', 'similarity']])  # 确保打印的列名与 DataFrame 中的实际列名匹配
-
-'''
-    for response_part in chat_with_ai():
-    print(response_part, end="")
-'''

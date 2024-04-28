@@ -1,11 +1,16 @@
+import os
+
+os.environ["OPENAI_API_KEY"] = "sk-emcpbO6oET6MH0TX72847c716eD44aB2B449B63b19A60538"
+
+os.environ["OPENAI_BASE_URL"] = "https://gtapi.xiaoerchaoren.com:8932/v1"
+
 from openai import OpenAI
 
-client = OpenAI(
-    api_key="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",  # 替换为你的API密钥
-)
+client = OpenAI()
 
 
-def chat_with_ai(messages, model="gpt-4-turbo"):
+#流式输出
+def chat_with_ai(messages, model="gpt-4-1106-preview"):
     stream = client.chat.completions.create(
         model=model,
         messages=messages,
@@ -17,6 +22,8 @@ def chat_with_ai(messages, model="gpt-4-turbo"):
             yield chunk.choices[0].delta.content  # 使用 yield 而不是 print
 
 
-'''# 使用示例
-for response_part in chat_with_ai("user", "用Verilog写FIFO代码"):
+# 使用示例
+'''input_query = input("输入你的问题: ")
+message = [{"role": "user", "content": input_query}]
+for response_part in chat_with_ai(message):
     print(response_part, end="")'''
